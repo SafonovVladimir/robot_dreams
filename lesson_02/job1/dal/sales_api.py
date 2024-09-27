@@ -33,7 +33,6 @@ def get_sales(date: str) -> List[Dict[str, Any]]:
         if status_code == 200:
             print("Response status code:", response.status_code)
             data.extend(response.json())
-
+        else:
+            print(f"Response status code: {status_code}\nExit from GET OPERATION")
     return data
-
-get_sales("2022-08-11")
