@@ -19,9 +19,9 @@ def remove_all_files_from_directory(directory: Path) -> None:
 
 
 def create_or_clean_is_exists_directory(json_content: bool, path: str, date: str) -> None:
-    work_directory = Path(os.getcwd())
+    project_directory = Path(os.path.dirname(os.path.abspath(__file__))).parents[1]
     suffix_path = Path(path)
-    storage_directory = Path(work_directory, "file_storage", suffix_path, date)
+    storage_directory = Path(project_directory, "file_storage", suffix_path, date)
 
     if json_content:
         if os.path.exists(storage_directory):
@@ -45,8 +45,3 @@ def save_to_disk(date: str, json_content: List[Dict[str, Any]], path: str) -> No
     else:
         create_or_clean_is_exists_directory(False, path, date)
         print("There are no sales records for this date!")
-
-
-def get_data_and_safe_to_storage(date: str, raw_dir: str) -> None:
-    content = get_sales(date)
-    save_to_disk(date, content, raw_dir)
