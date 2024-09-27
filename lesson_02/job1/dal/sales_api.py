@@ -32,4 +32,5 @@ def get_sales(date: str) -> List[Dict[str, Any]]:
         page += 1
         if status_code == 200:
             data.extend(response.json())
+
     return data
