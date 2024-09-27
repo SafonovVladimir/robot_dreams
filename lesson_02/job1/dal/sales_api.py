@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
 
-API_URL = "https://fake-api-vycpfa6oca-uc.a.run.app/"
+API_URL = "https://fake-api-vycpfa6oca-uc.a.run.app/sales"
 
 
 def get_sales(date: str) -> List[Dict[str, Any]]:
@@ -24,7 +24,7 @@ def get_sales(date: str) -> List[Dict[str, Any]]:
     while status_code == 200:
 
         response = requests.get(
-            url=f"{API_URL}sales",
+            url=API_URL,
             params={"date": date, "page": page},
             headers={"Authorization": AUTH_TOKEN},
         )
