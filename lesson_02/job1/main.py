@@ -6,7 +6,8 @@ import os
 
 from flask import Flask, request
 from flask import typing as flask_typing
-from lesson_02.job1.dal.local_disk import get_data_and_safe_to_storage
+
+from lesson_02.job1.bll.sales_api import save_sales_to_local_disk
 
 from dotenv import load_dotenv
 
@@ -40,7 +41,7 @@ def main() -> flask_typing.ResponseReturnValue:
             "message": "date parameter missed",
         }, 400
 
-    get_data_and_safe_to_storage(date=date, raw_dir=raw_dir)
+    save_sales_to_local_disk(date=date, raw_dir=raw_dir)
 
     return {
         "message": "Data retrieved successfully from API",
