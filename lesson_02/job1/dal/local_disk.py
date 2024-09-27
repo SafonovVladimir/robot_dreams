@@ -18,8 +18,8 @@ def remove_all_files_from_directory(directory: Path) -> None:
             print("Failed to delete %s. Reason: %s" % (file_path, e))
 
 
-def create_or_clean_is_exists_directory(json_content: bool, path: str) -> None:
-    work_directory = Path(os.getcwd()).parents[1]
+def create_or_clean_is_exists_directory(json_content: bool, path: str, date: str) -> None:
+    work_directory = Path(os.getcwd())
     suffix_path = Path(path)
     storage_directory = Path(work_directory, "file_storage", suffix_path, date)
 
@@ -31,21 +31,22 @@ def create_or_clean_is_exists_directory(json_content: bool, path: str) -> None:
         os.chdir(storage_directory)
 
 
-def save_to_disk(json_content: List[Dict[str, Any]], path: str) -> None:
+def save_to_disk(date: str, json_content: List[Dict[str, Any]], path: str) -> None:
     if json_content:
-        create_or_clean_is_exists_directory(True, path)
+        create_or_clean_is_exists_directory(True, path, date)
         file_number = 1
+
         for record in json_content:
-            with open(f"sales_{date}_{file_number}", "w") as file:
+            with open(f"sales_{date}_{file_number}.json", "w") as file:
                 file.write(str(record))
             file_number += 1
         print(f"All records for {date} have been added to local storage.")
+
     else:
-        create_or_clean_is_exists_directory(False, path)
+        create_or_clean_is_exists_directory(False, path, date)
         print("There are no sales records for this date!")
 
 
-date = "2022-08-10"
-content = get_sales(date)
-
-save_to_disk(content, "raw/sales")
+def get_data_and_safe_to_storage(date: str, raw_dir: str) -> None:
+    content = get_sales(date)
+    save_to_disk(date, content, raw_dir)
