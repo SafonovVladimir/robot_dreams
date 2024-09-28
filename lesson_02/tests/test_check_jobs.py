@@ -17,7 +17,7 @@ RAW_DIR = os.path.join(BASE_DIR, "file_storage", "raw", "sales")
 STG_DIR = os.path.join(BASE_DIR, "file_storage", "stg", "sales", "2022-08-09")
 
 
-def run_job1():
+def test_run_job1():
     print("Starting job1:")
     resp = requests.post(
         url=f'http://localhost:{JOB1_PORT}/',
@@ -30,7 +30,7 @@ def run_job1():
     print("job1 completed!")
 
 
-def run_job2():
+def test_run_job2():
     print("Starting job2:")
     resp = requests.post(
         url=f'http://localhost:{JOB2_PORT}/',
@@ -44,6 +44,6 @@ def run_job2():
 
 
 if __name__ == '__main__':
-    run_job1()
+    test_run_job1()
     time.sleep(3)
-    run_job2()
+    test_run_job2()

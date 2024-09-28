@@ -4,7 +4,7 @@ Tests dal.local_disk.py module
 """
 from unittest import TestCase, mock
 
-from lesson_02.ht_template.job1.dal.local_disk import save_to_disk
+# from lesson_02.job1.dal.local_disk import save_to_disk
 
 
 class SaveToDiskTestCase(TestCase):
