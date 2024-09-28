@@ -38,7 +38,7 @@ def main() -> flask_typing.ResponseReturnValue:
     message = save_sales_to_local_disk(date=date, raw_dir=raw_dir)
 
     return {
-        f"message": f"{message}",
+        "message": f"{message}",
     }, 201
 
 

@@ -1,11 +1,11 @@
 import unittest
-from unittest import mock
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from pathlib import Path
 import os
 
 from lesson_02.constants import PROJECT_DIRECTORY
-from lesson_02.directory_functions import remove_all_files_from_directory, create_or_clean_is_exists_directory
+from lesson_02.directory_functions import (remove_all_files_from_directory,
+                                           create_or_clean_is_exists_directory)
 
 
 class TestRemoveFiles(unittest.TestCase):
@@ -16,7 +16,15 @@ class TestRemoveFiles(unittest.TestCase):
     @patch('os.unlink')
     @patch('os.path.isdir')
     @patch('shutil.rmtree')
-    def test_remove_all_files(self, mock_rmtree, mock_isdir, mock_unlink, mock_islink, mock_isfile, mock_listdir):
+    def test_remove_all_files(
+            self,
+            mock_rmtree,
+            mock_isdir,
+            mock_unlink,
+            mock_islink,
+            mock_isfile,
+            mock_listdir
+    ):
         # Arrange
         directory = Path("/mock_directory")
         mock_listdir.return_value = ['file1.txt', 'file2.txt', 'subdir']
@@ -41,7 +49,13 @@ class TestRemoveFiles(unittest.TestCase):
     @patch("os.path.exists")
     @patch("os.chdir")
     @patch("lesson_02.directory_functions.remove_all_files_from_directory")
-    def test_create_or_clean_is_exists_directory(self, mock_remove_all_files, mock_chdir, mock_exists, mock_makedirs):
+    def test_create_or_clean_is_exists_directory(
+            self,
+            mock_remove_all_files,
+            mock_chdir,
+            mock_exists,
+            mock_makedirs
+    ):
         # Test when the directory exists
         mock_exists.return_value = True
 

@@ -25,7 +25,9 @@ class GetSalesTestCase(unittest.TestCase):
         # Mocking the response for page 1 and page 2
         mock_response_page_1 = Mock()
         mock_response_page_1.status_code = 200
-        mock_response_page_1.json.return_value = [{"id": 1, "sale": 100}, {"id": 2, "sale": 200}]
+        mock_response_page_1.json.return_value = [
+            {"id": 1, "sale": 100}, {"id": 2, "sale": 200}
+        ]
 
         mock_response_page_2 = Mock()
         mock_response_page_2.status_code = 200
@@ -36,7 +38,9 @@ class GetSalesTestCase(unittest.TestCase):
         mock_response_end.json.return_value = []
 
         # Simulate the sequential call for different pages
-        mock_get.side_effect = [mock_response_page_1, mock_response_page_2, mock_response_end]
+        mock_get.side_effect = [
+            mock_response_page_1, mock_response_page_2, mock_response_end
+        ]
 
         # Call the get_sales function
         sales_data = get_sales("2023-09-20")

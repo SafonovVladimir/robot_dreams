@@ -46,7 +46,17 @@ def create_avro_files(raw_path, stg_full_path) -> str:
     try:
         for json_file in get_json_files(raw_path, date):
             with open(json_file[0], "r") as input_file:
-                with open(f"{Path(path_to_avro_files, json_file[1].split('.')[0])}.avro", "wb") as avro_file:
-                    writer(avro_file, schema, [dict(json.loads(input_file.read().replace("'", '"')))])
+                with open(
+                        f"{Path(path_to_avro_files, json_file[1].split('.')[0])}"
+                        f".avro", "wb"
+                ) as avro_file:
+                    writer(
+                        avro_file, schema,
+                        [
+                            dict(
+                                json.loads(input_file.read().replace("'", '"'))
+                            )
+                        ]
+                    )
     except OSError as e:
         print("Error:", e)
