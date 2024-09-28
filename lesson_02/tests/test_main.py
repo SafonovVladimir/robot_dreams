@@ -1,14 +1,7 @@
-"""
-Tests for main.py
-# TODO: write tests
-"""
 from unittest import TestCase, mock
 
 from lesson_02.job1 import main
 
-
-# NB: avoid relative imports when you will write your code
-# from .. import main
 
 
 class MainFunctionTestCase(TestCase):
