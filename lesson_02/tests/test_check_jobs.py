@@ -2,7 +2,7 @@ import os
 import time
 import requests
 
-from lesson_02.constants import PROJECT_DIRECTORY
+from lesson_02.settings.constants import PROJECT_DIRECTORY
 
 BASE_DIR = PROJECT_DIRECTORY
 

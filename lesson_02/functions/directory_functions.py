@@ -2,7 +2,7 @@ import os
 import shutil
 from pathlib import Path
 
-from lesson_02.constants import PROJECT_DIRECTORY
+from lesson_02.settings.constants import PROJECT_DIRECTORY
 
 
 def remove_all_files_from_directory(directory: Path) -> None:

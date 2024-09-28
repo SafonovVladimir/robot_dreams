@@ -6,9 +6,9 @@ from pathlib import Path
 
 from fastavro import writer
 
-from lesson_02.directory_functions import create_or_clean_is_exists_directory
+from lesson_02.functions.directory_functions import create_or_clean_is_exists_directory
 from lesson_02.job2.avro_schema import schema
-from lesson_02.constants import PROJECT_DIRECTORY
+from lesson_02.settings.constants import PROJECT_DIRECTORY
 
 
 def get_json_files(directory: str, date: str) -> list:

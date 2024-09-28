@@ -3,9 +3,9 @@ from unittest.mock import patch
 from pathlib import Path
 import os
 
-from lesson_02.constants import PROJECT_DIRECTORY
-from lesson_02.directory_functions import (remove_all_files_from_directory,
-                                           create_or_clean_is_exists_directory)
+from lesson_02.settings.constants import PROJECT_DIRECTORY
+from lesson_02.functions.directory_functions import (remove_all_files_from_directory,
+                                                     create_or_clean_is_exists_directory)
 
 
 class TestRemoveFiles(unittest.TestCase):
