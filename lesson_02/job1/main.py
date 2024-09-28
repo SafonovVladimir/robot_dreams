@@ -18,8 +18,8 @@ def main() -> flask_typing.ResponseReturnValue:
 
     Proposed POST body in JSON:
     {
-      "data: "2022-08-09",
-      "raw_dir": "/path/to/my_dir/raw/sales/2022-08-09"
+      "date: "2022-08-09",
+      "raw_dir": "path_to_my_dir/raw/sales"
     }
     """
     input_data: dict = request.json
@@ -30,11 +30,15 @@ def main() -> flask_typing.ResponseReturnValue:
         return {
             "message": "date parameter missed",
         }, 400
+    if not raw_dir:
+        return {
+            "message": "raw_dir (path to file storage) parameter missed",
+        }, 400
 
-    save_sales_to_local_disk(date=date, raw_dir=raw_dir)
+    message = save_sales_to_local_disk(date=date, raw_dir=raw_dir)
 
     return {
-        "message": "Data retrieved successfully from API",
+        f"message": f"{message}",
     }, 201
 
 
