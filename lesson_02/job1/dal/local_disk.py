@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 from typing import List, Dict, Any
 
-from lesson_02.job1.dal.sales_api import get_sales
+from lesson_02.settings import PROJECT_DIRECTORY
 
 
 def remove_all_files_from_directory(directory: Path) -> None:
@@ -19,9 +19,8 @@ def remove_all_files_from_directory(directory: Path) -> None:
 
 
 def create_or_clean_is_exists_directory(json_content: bool, path: str, date: str) -> None:
-    project_directory = Path(os.path.dirname(os.path.abspath(__file__))).parents[1]
     suffix_path = Path(path)
-    storage_directory = Path(project_directory, "file_storage", suffix_path, date)
+    storage_directory = Path(PROJECT_DIRECTORY, "file_storage", suffix_path, date)
 
     if json_content:
         if os.path.exists(storage_directory):

@@ -2,20 +2,10 @@
 This file contains the controller that accepts command via HTTP
 and trigger business logic layer
 """
-import os
-
 from flask import Flask, request
 from flask import typing as flask_typing
 
 from lesson_02.job1.bll.sales_api import save_sales_to_local_disk
-
-from dotenv import load_dotenv
-
-load_dotenv()
-AUTH_TOKEN = os.getenv("AUTH_TOKEN")
-
-if not AUTH_TOKEN:
-    print("AUTH_TOKEN environment variable must be set")
 
 app = Flask(__name__)
 
