@@ -1,10 +1,6 @@
-import os
-import shutil
-from pathlib import Path
 from typing import List, Dict, Any
 
 from lesson_02.directory_functions import create_or_clean_is_exists_directory
-from lesson_02.constants import PROJECT_DIRECTORY
 
 
 def save_to_disk(date: str, json_content: List[Dict[str, Any]], path: str) -> str:

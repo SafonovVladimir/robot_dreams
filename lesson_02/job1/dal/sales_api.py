@@ -1,7 +1,7 @@
 import os
 
 import requests
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
 from dotenv import load_dotenv
 
 load_dotenv()
