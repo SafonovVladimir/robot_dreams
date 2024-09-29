@@ -54,11 +54,18 @@ LIMIT 1;
 Вивести назви фільмів, яких не має в inventory.
 Запит має бути без оператора IN
 */
--- SQL code goes here...
+
+SELECT film.title AS title
+FROM film
+WHERE NOT EXISTS(
+    SELECT inventory.film_id AS film_id
+    FROM inventory
+    WHERE inventory.film_id = film.film_id);
 
 
 /*
 5.
 Вивести топ 3 актори, які найбільше зʼявлялись в категорії фільмів “Children”.
 */
--- SQL code goes here...
+
+
