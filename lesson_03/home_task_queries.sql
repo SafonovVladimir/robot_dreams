@@ -68,4 +68,12 @@ WHERE NOT EXISTS(
 Вивести топ 3 актори, які найбільше зʼявлялись в категорії фільмів “Children”.
 */
 
-
+SELECT CONCAT(actor.first_name, ' ', actor.last_name) AS actor_full_name
+FROM actor
+JOIN film_actor ON actor.actor_id = film_actor.actor_id
+JOIN film_category ON film_actor.film_id = film_category.film_id
+JOIN category ON film_category.category_id = category.category_id
+WHERE category.name = 'Children'
+GROUP BY actor.actor_id, actor.first_name, actor.last_name
+ORDER BY COUNT(film_actor.film_id) DESC
+LIMIT 3;
