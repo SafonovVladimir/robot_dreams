@@ -38,9 +38,16 @@ LIMIT 10;
 Вивести категорія фільмів, на яку було витрачено найбільше грошей
 в прокаті
 */
--- SQL code goes here...
-
-
+SELECT SUM(payment.amount) AS amount, category.name AS categoty
+FROM payment
+JOIN rental ON payment.rental_id = rental.rental_id
+JOIN inventory ON rental.inventory_id = inventory.inventory_id
+JOIN film ON inventory.film_id = film.film_id
+JOIN film_category ON film.film_id = film_category.film_id
+JOIN category ON film_category.category_id = category.category_id
+GROUP BY category.name
+ORDER BY amount DESC
+LIMIT 1;
 
 /*
 4.
