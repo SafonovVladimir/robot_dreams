@@ -22,13 +22,11 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
-# TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_BOT_TOKEN = "7028920775:AAFII8XWM1BOHh6sDqrIMK_QTE1OdZ4V9kg"
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 if not TELEGRAM_BOT_TOKEN:
     print("TELEGRAM_BOT_TOKEN environment variable must be set")
 
-# CHAT_ID = os.getenv("CHAT_ID")
-CHAT_ID = "724066917"
+CHAT_ID = os.getenv("CHAT_ID")
 if not CHAT_ID:
     print("CHAT_ID environment variable must be set")
 
