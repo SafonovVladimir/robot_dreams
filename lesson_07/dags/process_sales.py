@@ -1,9 +1,14 @@
+import asyncio
+import os
+
 import requests
+from aiogram import Bot
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
-
+load_dotenv()
 
 # Define default arguments for the DAG
 default_args = {
@@ -17,6 +22,33 @@ default_args = {
     "retry_delay": timedelta(minutes=5),
 }
 
+# TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_BOT_TOKEN = "7028920775:AAFII8XWM1BOHh6sDqrIMK_QTE1OdZ4V9kg"
+if not TELEGRAM_BOT_TOKEN:
+    print("TELEGRAM_BOT_TOKEN environment variable must be set")
+
+# CHAT_ID = os.getenv("CHAT_ID")
+CHAT_ID = "724066917"
+if not CHAT_ID:
+    print("CHAT_ID environment variable must be set")
+
+
+# Define a function to send a Telegram message
+async def send_telegram_message(message: str):
+    bot = Bot(token=TELEGRAM_BOT_TOKEN)
+    async with bot:
+        await bot.send_message(chat_id=CHAT_ID, text=message)
+
+
+def send_success_notification(execution_date):
+    date_str = execution_date.strftime("%Y-%m-%d")
+    message = (
+        f"DAG 'process_sales' completed successfully. "
+        f"All data for date {date_str} have been extracted and converted"
+    )
+    asyncio.run(send_telegram_message(message))
+
+
 # Define the DAG
 with DAG(
         "process_sales",
@@ -26,9 +58,8 @@ with DAG(
         catchup=True,  # Виконувати DAG для попередніх днів
         max_active_runs=1,  # Обмежити кількість активних запусків до 1
 ) as dag:
-
     # Define the function to trigger the first job (extract data from API)
-    def extract_data_from_api(execution_date, **kwargs):
+    def extract_data_from_api(execution_date):
         date_str = execution_date.strftime("%Y-%m-%d")
         raw_dir = "raw/sales"
 
@@ -47,7 +78,7 @@ with DAG(
 
 
     # Define the function to trigger the second job (convert to Avro)
-    def convert_to_avro(execution_date, **kwargs):
+    def convert_to_avro(execution_date):
         date_str = execution_date.strftime("%Y-%m-%d")
         raw_dir = "raw/sales"
         stg_dir = f"stg/sales/{date_str}"
@@ -81,5 +112,12 @@ with DAG(
         dag=dag,
     )
 
+    send_notification_task = PythonOperator(
+        task_id="send_telegram_notification",
+        provide_context=True,
+        python_callable=send_success_notification,
+        dag=dag,
+    )
+
     # Dependencies of tasks
-    extract_data_task >> convert_to_avro_task
+    extract_data_task >> convert_to_avro_task >> send_notification_task
