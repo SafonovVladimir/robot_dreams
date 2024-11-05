@@ -9,7 +9,6 @@ from datetime import datetime
 from settings.constants import BUCKET, GCP_CONN_ID, LOCAL_ROOT_DIRECTORY
 from functions.job_functions import get_files_with_relative_paths
 
-
 default_args = {
     "owner": "airflow",
     "retries": 1,
