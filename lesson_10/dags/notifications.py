@@ -34,7 +34,7 @@ def send_success_notification(**kwargs):
     dag_id = kwargs['dag'].dag_id
     message = (
         f"✅ DAG '{dag_id}' completed successfully! \n"
-        f"All records for date {UPLOAD_DATE} have been extracted and converted 😊"
+        f"All records for date {UPLOAD_DATE} have been uploaded! 😊"
     )
     asyncio.run(send_telegram_message(message))
 
