@@ -11,8 +11,8 @@ from functions import list_csv_sales_files
 
 # SQL query to avoid duplicate data via MERGE
 merge_sales_sql = """
-MERGE INTO `sep2024-volodymyr-safonov.bronze.sales` AS target
-USING `sep2024-volodymyr-safonov.bronze.staging_sales` AS source
+MERGE INTO sep2024-volodymyr-safonov.bronze.sales AS target
+USING sep2024-volodymyr-safonov.bronze.staging_sales AS source
 ON target.CustomerId = source.CustomerId
    AND target.PurchaseDate = source.PurchaseDate
    AND target.Product = source.Product
@@ -72,14 +72,14 @@ with DAG(
     transform_to_silver = BigQueryExecuteQueryOperator(
         task_id="transform_sales_to_silver",
         sql="""
-            CREATE OR REPLACE TABLE `sep2024-volodymyr-safonov.silver.sales`
+            CREATE OR REPLACE TABLE sep2024-volodymyr-safonov.silver.sales
             PARTITION BY purchase_date AS
             SELECT
                 SAFE_CAST(CustomerId AS STRING) AS client_id,
-                SAFE.PARSE_DATE('%Y-%m-%d', PurchaseDate) AS purchase_date,
+                SAFE.PARSE_DATE("%Y-%m-%d", PurchaseDate) AS purchase_date,
                 SAFE_CAST(Product AS STRING) AS product_name,
-                SAFE_CAST(REGEXP_REPLACE(Price, r'[^0-9.]', '') AS FLOAT64) AS price
-            FROM `sep2024-volodymyr-safonov.bronze.sales`
+                SAFE_CAST(REGEXP_REPLACE(Price, r"[^0-9.]", "") AS FLOAT64) AS price
+            FROM sep2024-volodymyr-safonov.bronze.sales
             WHERE
                 CustomerId IS NOT NULL
                 AND PurchaseDate IS NOT NULL

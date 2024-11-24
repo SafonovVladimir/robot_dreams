@@ -13,8 +13,8 @@ from functions import list_csv_customers_files
 
 # SQL query to avoid duplicate data via MERGE
 merge_customers_sql = """
-MERGE INTO `sep2024-volodymyr-safonov.bronze.customers` AS target
-USING `sep2024-volodymyr-safonov.bronze.staging_customers` AS source
+MERGE INTO sep2024-volodymyr-safonov.bronze.customers AS target
+USING sep2024-volodymyr-safonov.bronze.staging_customers AS source
 ON target.Id = source.Id
 WHEN MATCHED THEN
     UPDATE SET 
@@ -87,7 +87,7 @@ with DAG(
                 SAFE_CAST(FirstName AS STRING) AS first_name,
                 SAFE_CAST(LastName AS STRING) AS last_name,
                 SAFE_CAST(Email AS STRING) AS email,
-                SAFE.PARSE_DATE('%Y-%m-%d', RegistrationDate) AS registration_date,
+                SAFE.PARSE_DATE("%Y-%m-%d", RegistrationDate) AS registration_date,
                 SAFE_CAST(State AS STRING) AS state
             FROM sep2024-volodymyr-safonov.bronze.customers
             WHERE
