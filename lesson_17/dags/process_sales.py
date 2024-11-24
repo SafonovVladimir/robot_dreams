@@ -1,27 +1,16 @@
 import os
 
 from airflow import DAG
-from airflow.providers.google.cloud.hooks.gcs import GCSHook
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator, BigQueryExecuteQueryOperator
 from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 from datetime import datetime
 
 from airflow.utils.task_group import TaskGroup
-from constants import BUCKET_NAME, SALES_FOLDER_PATH, PROJECT_DATASET_STAGING_TABLE
-
-
-def list_csv_sales_files(bucket_name: str, folder_name: str) -> list:
-    """
-    List all CSV files in a robot_dreams_hw_17/data/sales bucket, including subfolders.
-    """
-    gcs_hook = GCSHook()
-    files = gcs_hook.list(bucket_name, prefix=folder_name)
-    csv_files = [file for file in files if file.endswith(".csv")]
-    return csv_files
-
+from constants import BUCKET_NAME, SALES_FOLDER_PATH, SALES_DATASET_STAGING_TABLE
+from functions import list_csv_sales_files
 
 # SQL query to avoid duplicate data via MERGE
-merge_sql = """
+merge_sales_sql = """
 MERGE INTO `sep2024-volodymyr-safonov.bronze.sales` AS target
 USING `sep2024-volodymyr-safonov.bronze.staging_sales` AS source
 ON target.CustomerId = source.CustomerId
@@ -41,20 +30,20 @@ with DAG(
 ) as dag:
     csv_files = list_csv_sales_files(BUCKET_NAME, SALES_FOLDER_PATH)
 
-    with TaskGroup("upload_csv_files_group") as upload_group:
-        previous_task = None  # Track the previous task for dynamic chaining
+    with TaskGroup("upload_sales_csv_files") as sales_group:
+        previous_task = None
 
         for file in csv_files:
             load_to_bronze = GCSToBigQueryOperator(
                 task_id=f"upload_{os.path.basename(file)}",
                 bucket=BUCKET_NAME,
                 source_objects=[file],
-                destination_project_dataset_table=PROJECT_DATASET_STAGING_TABLE,
+                destination_project_dataset_table=SALES_DATASET_STAGING_TABLE,
                 source_format="CSV",
                 write_disposition="WRITE_TRUNCATE",
                 skip_leading_rows=1,
                 autodetect=False,
-                schema_fields=[  # Define schema explicitly
+                schema_fields=[
                     {"name": "CustomerId", "type": "STRING", "mode": "NULLABLE"},
                     {"name": "PurchaseDate", "type": "STRING", "mode": "NULLABLE"},
                     {"name": "Product", "type": "STRING", "mode": "NULLABLE"},
@@ -67,13 +56,12 @@ with DAG(
                 task_id=f"merge_{os.path.basename(file)}",
                 configuration={
                     "query": {
-                        "query": merge_sql,
+                        "query": merge_sales_sql,
                         "useLegacySql": False,
                     }
                 }
             )
 
-            # Set dependencies so merge runs right after the current file is uploaded
             if previous_task:
                 previous_task >> load_to_bronze
 
@@ -101,4 +89,4 @@ with DAG(
         use_legacy_sql=False,
     )
 
-    upload_group >> transform_to_silver
+    sales_group >> transform_to_silver
