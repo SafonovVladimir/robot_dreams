@@ -31,9 +31,4 @@ def list_csv_customers_files(bucket_name: str, folder_name: str) -> list:
             customers_file_name_list.append(os.path.basename(customers_file))
             result_customers_files_list.append(customers_file)
 
-    print("~" * 200)
-    print(f"{customers_csv_files=}")
-    print(f"{customers_file_name_list=}")
-    print(f"{result_customers_files_list=}")
-    print("~" * 200)
     return result_customers_files_list
