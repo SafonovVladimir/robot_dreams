@@ -32,3 +32,14 @@ def list_csv_customers_files(bucket_name: str, folder_name: str) -> list:
             result_customers_files_list.append(customers_file)
 
     return result_customers_files_list
+
+
+def read_sql_file(file_path):
+    """Reads a SQL file and returns its content."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            return file.read()
+    except FileNotFoundError:
+        print(f"Error: File not found: {file_path}")
+    except Exception as e:
+        print(f"Error reading {file_path}: {e}")
