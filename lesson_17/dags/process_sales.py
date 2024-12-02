@@ -6,21 +6,9 @@ from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQue
 from datetime import datetime
 
 from airflow.utils.task_group import TaskGroup
-from constants import BUCKET_NAME, SALES_FOLDER_PATH, SALES_DATASET_STAGING_TABLE
-from functions import list_csv_sales_files
-
-# SQL query to avoid duplicate data via MERGE
-merge_sales_sql = """
-MERGE INTO sep2024-volodymyr-safonov.bronze.sales AS target
-USING sep2024-volodymyr-safonov.bronze.staging_sales AS source
-ON target.CustomerId = source.CustomerId
-   AND target.PurchaseDate = source.PurchaseDate
-   AND target.Product = source.Product
-   AND target.Price = source.Price
-WHEN NOT MATCHED BY TARGET THEN
-    INSERT (CustomerId, PurchaseDate, Product, Price)
-    VALUES (source.CustomerId, source.PurchaseDate, source.Product, source.Price)
-"""
+from constants import BUCKET_NAME, SALES_FOLDER_PATH, SALES_DATASET_STAGING_TABLE, MERGE_SALES_SQL_PATH, \
+    TRANSFORM_SALES_TO_SILVER_PATH
+from functions import list_csv_sales_files, read_sql_file
 
 with DAG(
         "process_sales",
@@ -56,7 +44,7 @@ with DAG(
                 task_id=f"merge_{os.path.basename(file)}",
                 configuration={
                     "query": {
-                        "query": merge_sales_sql,
+                        "query": read_sql_file(MERGE_SALES_SQL_PATH),
                         "useLegacySql": False,
                     }
                 }
@@ -64,28 +52,12 @@ with DAG(
 
             if previous_task:
                 previous_task >> load_to_bronze
-
             load_to_bronze >> merge_uniq_data
-
             previous_task = merge_uniq_data
 
     transform_to_silver = BigQueryExecuteQueryOperator(
         task_id="transform_sales_to_silver",
-        sql="""
-            CREATE OR REPLACE TABLE sep2024-volodymyr-safonov.silver.sales
-            PARTITION BY purchase_date AS
-            SELECT
-                SAFE_CAST(CustomerId AS INT64) AS client_id,
-                SAFE.PARSE_DATE("%Y-%m-%d", PurchaseDate) AS purchase_date,
-                SAFE_CAST(Product AS STRING) AS product_name,
-                SAFE_CAST(REGEXP_REPLACE(Price, r"[^0-9.]", "") AS FLOAT64) AS price
-            FROM sep2024-volodymyr-safonov.bronze.sales
-            WHERE
-                CustomerId IS NOT NULL
-                AND PurchaseDate IS NOT NULL
-                AND Price IS NOT NULL 
-                AND Product IS NOT NULL
-        """,
+        sql=read_sql_file(TRANSFORM_SALES_TO_SILVER_PATH),
         use_legacy_sql=False,
     )
 

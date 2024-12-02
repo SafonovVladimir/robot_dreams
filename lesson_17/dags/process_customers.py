@@ -7,33 +7,15 @@ from datetime import datetime
 
 from airflow.utils.task_group import TaskGroup
 
-from constants import BUCKET_NAME, CUSTOMERS_FOLDER_PATH, CUSTOMERS_DATASET_STAGING_TABLE
-from functions import list_csv_customers_files
-
-
-# SQL query to avoid duplicate data via MERGE
-merge_customers_sql = """
-MERGE INTO sep2024-volodymyr-safonov.bronze.customers AS target
-USING sep2024-volodymyr-safonov.bronze.staging_customers AS source
-ON target.Id = source.Id
-WHEN MATCHED THEN
-    UPDATE SET 
-        FirstName = source.FirstName,
-        LastName = source.LastName,
-        Email = source.Email,
-        RegistrationDate = source.RegistrationDate,
-        State = source.State
-WHEN NOT MATCHED BY TARGET THEN
-    INSERT (Id, FirstName, LastName, Email, RegistrationDate, State)
-    VALUES (source.Id, source.FirstName, source.LastName, source.Email, source.RegistrationDate, source.State);
-"""
-
+from constants import BUCKET_NAME, CUSTOMERS_FOLDER_PATH, CUSTOMERS_DATASET_STAGING_TABLE, \
+    MERGE_CUSTOMERS_SQL_PATH, TRANSFORM_CUSTOMERS_TO_SILVER_PATH
+from functions import list_csv_customers_files, read_sql_file
 
 with DAG(
-    "process_customers",
-    schedule_interval="@daily",
-    start_date=datetime(2022, 9, 1),
-    catchup=False,
+        "process_customers",
+        schedule_interval="@daily",
+        start_date=datetime(2022, 9, 1),
+        catchup=False,
 ) as dag:
     csv_files = list_csv_customers_files(BUCKET_NAME, CUSTOMERS_FOLDER_PATH)
 
@@ -64,7 +46,7 @@ with DAG(
                 task_id=f"merge_{os.path.basename(file)}",
                 configuration={
                     "query": {
-                        "query": merge_customers_sql,
+                        "query": read_sql_file(MERGE_CUSTOMERS_SQL_PATH),
                         "useLegacySql": False,
                     }
                 }
@@ -80,21 +62,7 @@ with DAG(
     # Transform bronze.customers -> silver.customers
     transform_to_silver = BigQueryExecuteQueryOperator(
         task_id="transform_customers_to_silver",
-        sql="""
-            CREATE OR REPLACE TABLE sep2024-volodymyr-safonov.silver.customers AS
-            SELECT
-                SAFE_CAST(Id AS INT64) AS client_id,
-                SAFE_CAST(FirstName AS STRING) AS first_name,
-                SAFE_CAST(LastName AS STRING) AS last_name,
-                SAFE_CAST(Email AS STRING) AS email,
-                SAFE.PARSE_DATE("%Y-%m-%d", RegistrationDate) AS registration_date,
-                SAFE_CAST(State AS STRING) AS state
-            FROM sep2024-volodymyr-safonov.bronze.customers
-            WHERE
-                Id IS NOT NULL
-                AND Email IS NOT NULL
-                AND RegistrationDate IS NOT NULL
-        """,
+        sql=read_sql_file(TRANSFORM_CUSTOMERS_TO_SILVER_PATH),
         use_legacy_sql=False,
     )
 
